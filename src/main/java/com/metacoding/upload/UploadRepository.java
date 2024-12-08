@@ -10,4 +10,11 @@ public class UploadRepository {
 
     private final EntityManager em;
 
+    public void save(Upload upload) {
+        em.persist(upload);
+    }
+
+    public Upload findById(Integer id) {
+        return em.find(Upload.class, id);
+    }
 }

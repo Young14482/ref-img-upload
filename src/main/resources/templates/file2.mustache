@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Document</title>
+</head>
+<body>
+<h1>사진 파일 전송</h1>
+<hr>
+<form>
+    <input type="text" id="username"> <br>
+    <input type="file" id="img"> <br>
+    <button type="button" id="sendBtn">전송</button>
+</form>
+<script>
+    let imgInput = document.querySelector("#img");
+    let sendBtn = document.querySelector("#sendBtn");
+
+    let base64String = ""; // 전역 변수로 선언하여 파일 데이터 저장
+
+    imgInput.addEventListener("change", (e) => {
+        let file = imgInput.files[0];
+        console.log("file", file);
+
+        let reader = new FileReader();
+
+        reader.onload = () => {
+            base64String = reader.result; // Base64 데이터 저장
+            console.log("Base64 데이터 준비 완료:", base64String);
+        };
+
+        reader.readAsDataURL(file);
+    });
+
+    sendBtn.addEventListener("click", async () => {
+        let username = document.querySelector("#username").value;
+
+        if (!username || !base64String) {
+            alert("사용자 이름과 파일을 입력해주세요.");
+            return;
+        }
+
+        await myUpload(username, base64String);
+    });
+
+    async function myUpload(username, img) {
+        let user = {
+            username: username,
+            img: img
+        };
+
+        let requestBody = JSON.stringify(user);
+
+        let response = await fetch("/v2/upload", {
+            method: "post",
+            body: requestBody,
+            headers: {
+                "Content-Type": "application/json; charset=utf-8"
+            }
+        });
+
+        let responseBody = await response.json();
+
+        if (responseBody.success) {
+            location.href = "/";
+        }
+    }
+</script>
+</body>
+</html>
